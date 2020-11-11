@@ -9,6 +9,6 @@ namespace Web_service.Models
     {
         public string Alt { get; set; }
         public string Src { get; set; }
-        public double Size { get; set; }
+        public long Size { get; set; }
     }
 }
