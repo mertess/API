@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using System;
+using System.IO;
 
 namespace Web_service
 {
@@ -14,14 +9,21 @@ namespace Web_service
     {
         public static void Main(string[] args)
         {
+            CreateImgDirectory();
             CreateHostBuilder(args).Build().Run();
         }
 
+        private static void CreateImgDirectory()
+        {
+            if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "/Images"))
+                Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "Images");
+        }
+
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+                Host.CreateDefaultBuilder(args)
+                    .ConfigureWebHostDefaults(webBuilder =>
+                    {
+                        webBuilder.UseStartup<Startup>();
+                    });
     }
 }
