@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Web_service.Models;
 using Web_service.Services;
 
@@ -16,11 +14,25 @@ namespace Web_service.Controllers
     [ApiController]
     public class MainController : ControllerBase
     {
+
         [HttpGet]
-        public List<HostImages> GetImages(string url, int imageCount)
+        public List<HostImages> GetImages(string url, int threadCount, int imageCount)
         {
+            using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
+
             var images = HtmlParser.GetImages(HtmlDownloader.DownloadHtml(url), imageCount, url);
+            try
+            {
+                Parallel.ForEach(images, new ParallelOptions() { MaxDegreeOfParallelism = threadCount, CancellationToken = cancellationTokenSource.Token }, (image) =>
+                {
+                    Debug.WriteLine("downloading... ");
+                    new ImageDownloader().DownloadImage(image);
+                });
+            }
+            catch { }
+
             var hostsImages = images
+                .Where(img => img.Size != long.MinValue)
                 .GroupBy(image => new Uri(image.Src).Host)
                 .Select(imgGroup => new HostImages()
                 {
@@ -28,9 +40,9 @@ namespace Web_service.Controllers
                     Images = imgGroup.ToList()
                 })
                 .ToList();
-            //ImageDownloader imageDownloader = new ImageDownloader();
-            //imageDownloader.DownloadImage(images[0]);
+
+            Response.Headers.Add("Operation-result", $"Downloaded {images.Count(img => img.Size != long.MinValue)}/{imageCount} images");
             return hostsImages;
         }
-    } 
+    }
 }

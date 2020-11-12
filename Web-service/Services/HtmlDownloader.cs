@@ -13,14 +13,18 @@ namespace Web_service.Services
     {
         public static string DownloadHtml(string url)
         {
-            WebRequest request = WebRequest.Create(url);
-            WebResponse response = request.GetResponse();
-
-            using StreamReader reader = new StreamReader(response.GetResponseStream());
             StringBuilder stringBuilder = new StringBuilder();
-            while (!reader.EndOfStream)
-                stringBuilder.Append(reader.ReadLine());
+            try
+            {
+                WebRequest request = WebRequest.Create(url);
+                WebResponse response = request.GetResponse();
 
+                using StreamReader reader = new StreamReader(response.GetResponseStream());
+
+                while (!reader.EndOfStream)
+                    stringBuilder.Append(reader.ReadLine());
+            }
+            catch (Exception ex) { Debug.WriteLine(ex.Message); }
             return stringBuilder.ToString();
         }
     }

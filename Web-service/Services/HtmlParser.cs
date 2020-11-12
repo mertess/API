@@ -16,26 +16,32 @@ namespace Web_service.Services
         
         public static List<Image> GetImages(string html, int imageCount, string url)
         {
-            var urlAuthority = new Uri(url).GetLeftPart(UriPartial.Authority);
-            var imagesSrc = new Regex(imgSrcPattern)
-                .Matches(html)
-                .Take(imageCount)
-                .Select(i => !i.Groups[1].Value.Contains("http") ?  urlAuthority + i.Groups[1].Value : i.Groups[1].Value)
-                .ToList();
-            var imagesAlt = new Regex(imgAltPattern)
-                .Matches(html)
-                .Take(imageCount)
-                .Select(i => i.Groups[1].Value)
-                .ToList();
+            List<Image> images = null;
+            try
+            {
+                var urlAuthority = new Uri(url).GetLeftPart(UriPartial.Authority);
+                var imagesSrc = new Regex(imgSrcPattern)
+                    .Matches(html)
+                    .Take(imageCount)
+                    .Select(i => !i.Groups[1].Value.Contains("http") ? urlAuthority + i.Groups[1].Value : i.Groups[1].Value)
+                    .ToList();
+                var imagesAlt = new Regex(imgAltPattern)
+                    .Matches(html)
+                    .Take(imageCount)
+                    .Select(i => i.Groups[1].Value)
+                    .ToList();
 
-            return Enumerable.Range(0, imagesSrc.Count())
-                .Select(r => new Image() 
-                { 
-                    Src = imagesSrc[r],
-                    Alt = imagesAlt[r],
-                    Size = long.MinValue
-                })
-                .ToList();
+                images = Enumerable.Range(0, imagesSrc.Count())
+                    .Select(r => new Image()
+                    {
+                        Src = imagesSrc[r],
+                        Alt = imagesAlt[r],
+                        Size = long.MinValue
+                    })
+                    .ToList();
+            }
+            catch (Exception ex) { Debug.WriteLine(ex.Message); }
+            return images ?? new List<Image>();
         }
     }
 }
