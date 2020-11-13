@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using NLog.Fluent;
+using NLog.Web;
 using System;
 using System.IO;
 
@@ -9,14 +11,16 @@ namespace Web_service
     {
         public static void Main(string[] args)
         {
-            CreateImgDirectory();
+            CreateImgLogDirectories();
             CreateHostBuilder(args).Build().Run();
         }
 
-        private static void CreateImgDirectory()
+        private static void CreateImgLogDirectories()
         {
-            if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "/Images"))
+            if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Images"))
                 Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "Images");
+            if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Logs"))
+                Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "Logs");
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

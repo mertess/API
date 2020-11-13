@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,17 +13,19 @@ namespace Web_service.Services
 {
     public class ImageDownloader
     {
-        //посмотреть
+        private static readonly Logger logger = NLog.Web.NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+
         public void DownloadImage(Image image)
         {
             try
             {
                 WebClient webClient = new WebClient();
                 webClient.DownloadFile(image.Src, AppDomain.CurrentDomain.BaseDirectory + "Images/" + image.Src.Substring(image.Src.LastIndexOf('/') + 1));
+
                 FileInfo fileInfo = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "Images/" + image.Src.Substring(image.Src.LastIndexOf('/') + 1));
                 image.Size = fileInfo.Length;
             }
-            catch (Exception ex) { Debug.WriteLine(ex.Message); }
+            catch (Exception ex) { logger.Warn($"{ex.Message} {ex.InnerException?.Message}"); }
         }
     }
 }

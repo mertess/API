@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,6 +12,8 @@ namespace Web_service.Services
 {
     public class HtmlDownloader
     {
+        private static readonly Logger logger = NLog.Web.NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+
         public static string DownloadHtml(string url)
         {
             StringBuilder stringBuilder = new StringBuilder();
@@ -24,7 +27,7 @@ namespace Web_service.Services
                 while (!reader.EndOfStream)
                     stringBuilder.Append(reader.ReadLine());
             }
-            catch (Exception ex) { Debug.WriteLine(ex.Message); }
+            catch (Exception ex) { logger.Warn($"{ex.Message} {ex.InnerException?.Message}"); }
             return stringBuilder.ToString();
         }
     }

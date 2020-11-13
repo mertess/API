@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -13,7 +14,8 @@ namespace Web_service.Services
     {
         private static readonly string imgSrcPattern = ".*?<img .*?src=\"(.*?)\"";
         private static readonly string imgAltPattern = ".*?<img .*?alt=\"(.*?)\"";
-        
+        private static readonly Logger logger = NLog.Web.NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+
         public static List<Image> GetImages(string html, int imageCount, string url)
         {
             List<Image> images = null;
@@ -40,7 +42,7 @@ namespace Web_service.Services
                     })
                     .ToList();
             }
-            catch (Exception ex) { Debug.WriteLine(ex.Message); }
+            catch (Exception ex) { logger.Warn($"{ex.Message} {ex.InnerException?.Message}"); }
             return images ?? new List<Image>();
         }
     }

@@ -25,11 +25,12 @@ namespace Web_service.Controllers
             {
                 Parallel.ForEach(images, new ParallelOptions() { MaxDegreeOfParallelism = threadCount, CancellationToken = cancellationTokenSource.Token }, (image) =>
                 {
-                    Debug.WriteLine("downloading... ");
                     new ImageDownloader().DownloadImage(image);
                 });
             }
-            catch { }
+            catch { 
+                //operation cancelled exception// 
+            }
 
             var hostsImages = images
                 .Where(img => img.Size != long.MinValue)
